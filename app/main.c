@@ -14,39 +14,36 @@
 #include "stm32g4_gpio.h"
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
+#include "tft_ili9341/stm32g4_ili9341.h"
+#include "tft_ili9341/stm32g4_xpt2046.h"
 
 #include <stdio.h>
-
-#define BLINK_DELAY		100	//ms
 
 void write_LED(bool b)
 {
 	HAL_GPIO_WritePin(LED_GREEN_GPIO, LED_GREEN_PIN, b);
 }
 
-bool char_received(uart_id_t uart_id)
-{
-	if( BSP_UART_data_ready(uart_id) )	/* Si un caractère est reçu sur l'UART 2*/
-	{
-		/* On "utilise" le caractère pour vider le buffer de réception */
-		BSP_UART_get_next_byte(uart_id);
-		return true;
-	}
-	else
-		return false;
+void init_TFT_display() {
+	ILI9341_Rotate(ILI9341_Orientation_Landscape_2);
+	ILI9341_DrawFilledRectangle(0, 0, 160, 240, ILI9341_COLOR_BLUE);
+	ILI9341_DrawFilledRectangle(160, 0, 320, 240, ILI9341_COLOR_BLUE2);
+	ILI9341_DrawFilledRectangle(160, 0, 160, 240, ILI9341_COLOR_BLACK);
+	ILI9341_printf(15, 110, &Font_16x26, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE, "Espresso");
+	ILI9341_printf(190, 110, &Font_16x26, ILI9341_COLOR_BLACK, ILI9341_COLOR_BLUE2, "Coffee");
 }
 
-void heartbeat(void)
-{
-	while(! char_received(UART2_ID) )
-	{
-		write_LED(true);
-		HAL_Delay(50);
-		write_LED(false);
-		HAL_Delay(1500);
-	}
+void init_TFT_touch() {
+	ILI9341_setConfig();
+	XPT2046_init();
+
 }
 
+enum state_e {
+	INIT = 0,
+	IDLE,
+	WORKING
+};
 
 /**
   * @brief  Point d'entrée de votre application
@@ -66,24 +63,28 @@ int main(void)
 	/* Indique que les printf sont dirigés vers l'UART2 */
 	BSP_SYS_set_std_usart(UART2_ID, UART2_ID, UART2_ID);
 
+	/* Initialisation de l'écran TFT */
+	ILI9341_Init();
+	init_TFT_display();
+
 	/* Initialisation du port de la led Verte (carte Nucleo) */
 	BSP_GPIO_pin_config(LED_GREEN_GPIO, LED_GREEN_PIN, GPIO_MODE_OUTPUT_PP,GPIO_NOPULL,GPIO_SPEED_FREQ_HIGH,GPIO_NO_AF);
-
-	/* Hello student */
-	printf("Hi <Student>, can you read me?\n");
-
-	//heartbeat();
 
 	/* Tâche de fond, boucle infinie, Infinite loop,... quelque soit son nom vous n'en sortirez jamais */
 	while (1)
 	{
+		static int16_t static_x,static_y;
+		int16_t x, y;
 
-		if( char_received(UART2_ID) )
+		if(XPT2046_getMedianCoordinates(&x, &y, XPT2046_COORDINATE_SCREEN_RELATIVE))
 		{
-			write_LED(true);		/* write_LED? Faites un ctrl+clic dessus pour voir... */
-			HAL_Delay(BLINK_DELAY);	/* ... ça fonctionne aussi avec les macros, les variables. C'est votre nouveau meilleur ami */
-			write_LED(false);
+			static_x = x;
+			static_y = y;
+			if (y < 120) {
+				printf("Espresso\n");
+			} else if (y >= 120) {
+				printf("Coffee\n");
+			}
 		}
-
 	}
 }
