@@ -31,7 +31,7 @@ void close_coffee_servo(void);
 void TIMER2_user_handler_it(void);
 
 /**
-  * @brief  Point d'entrée de l'application
+  * @brief Point d'entrée de l'application
   */
 int main(void)
 {
