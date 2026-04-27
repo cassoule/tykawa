@@ -15,6 +15,8 @@
 #include "stm32g4_gpio.h"
 #include "stm32g4_uart.h"
 #include "stm32g4_utils.h"
+#include "tft_ili9341/stm32g4_ili9341.h"
+#include "tft_ili9341/stm32g4_xpt2046.h"
 
 #include "screen.h"
 #include "servo.h"
