@@ -56,6 +56,7 @@ void state_machine(void) {
 	typedef enum {
 		INIT = 0,
 		IDLE,
+		PAYMENT,
 		WORKING,
 		DONE
 	} state_e;
@@ -77,6 +78,21 @@ void state_machine(void) {
 			int choice = SCREEN_handle_click();
 			if (choice != 0) {
 				u_choice = choice;
+				delay = 0;
+				SCREEN_draw_payment_screen(u_choice);
+				state = PAYMENT;
+			}
+			break;
+		}
+
+		case PAYMENT: {
+			delay++;
+			int back = SCREEN_handle_back_click();
+			if (back == 1) {
+				SCREEN_draw_idle_screen();
+				state = IDLE;
+			}
+			if (delay == 5000000) {
 				SCREEN_draw_working_screen(u_choice);
 				uint32_t duration = COFFEE_DURATION_US * u_choice;
 				coffee_done = false;
@@ -84,7 +100,9 @@ void state_machine(void) {
 				open_coffee_servo();
 				// TODO: Ouverture vanne
 				state = WORKING;
+				// à terme ici on timeout et revient en IDLE et on met cette logique avec le NFC
 			}
+			// TODO: Handle NFC
 			break;
 		}
 
@@ -110,6 +128,7 @@ void state_machine(void) {
 		case DONE:
 			delay++;
 			if (delay == 5000000) {
+				delay = 0;
 				SCREEN_draw_idle_screen();
 				state = IDLE;
 			}
@@ -141,7 +160,6 @@ void close_coffee_servo(void) {
 		SERVO_set_position(0);
 		coffee_open = false;
 	}
-
 }
 
 /**
