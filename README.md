@@ -102,6 +102,7 @@ DONE --> IDLE : Retour à l'attente
 | ----------- | -------------------------------------- |
 | **INIT**    | Initialisation des différents éléments |
 | **IDLE**    | En attente de la sélection d'un café   |
+| **PAYMENT** | En attente du paiement (retour auto apres ~1s) |
 | **WORKING** | Préparation du café                    |
 | **DONE**    | Café prêt, écran de fin (~1s)          |
 
