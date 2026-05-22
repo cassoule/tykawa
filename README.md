@@ -89,7 +89,9 @@ Le firmware est organisé autour d’une **machine à états** représentant les
 stateDiagram-v2
 
 INIT --> IDLE
-IDLE --> WORKING : Sélection d'un café
+IDLE --> PAYMENT : Sélection d'un café
+PAYMENT --> IDLE : Retour ou temps écoulé
+PAYMENT --> WORKING : Paiement validé
 WORKING --> DONE : Café prêt
 DONE --> IDLE : Retour à l'attente
 ```
