@@ -43,7 +43,7 @@
 /*------------------Afficheurs------------------*/
 #define USE_ILI9341			1 // �cran TFT
 #if USE_ILI9341
-	#define USE_XPT2046			1
+	#define USE_XPT2046			0
 	#define USE_FONT7x10		1
 	#define USE_FONT11x18		1
 	#define USE_FONT16x26		1
