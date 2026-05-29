@@ -86,8 +86,6 @@ void state_machine(void) {
 
 	switch (state) {
 		case INIT:
-			printf("enter in init\n");
-
 			SCREEN_init();
 			SCREEN_draw_idle_screen();
 
@@ -120,7 +118,6 @@ void state_machine(void) {
 
 
 			if(receive_NFC_Data(&infos)){
-				printf("NFC frame received");
 				SCREEN_draw_working_screen(u_choice);
 				uint32_t duration = COFFEE_DURATION_US * u_choice;
 				coffee_done = false;

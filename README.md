@@ -12,6 +12,7 @@ L’objectif est de simuler le fonctionnement principal d’une machine à café
 ## 📌 Fonctionnalités
 
 - Interface utilisateur via **écran tactile TFT ILI9341**
+- Lecture de carte NFC pour valider la sélection
 - Simulation du **cycle de préparation du café**
 - Implémentation d’une **machine à états**
 - Gestion du temps via **timers du microcontrôleur**
@@ -20,11 +21,12 @@ L’objectif est de simuler le fonctionnement principal d’une machine à café
 Exemple de déroulement :
 
 1. L’utilisateur sélectionne un type de café
-2. _La machine chauffe l’eau_
-3. Le servomoteur laisse passer une dose de café soluble
-4. La pompe s’active
-5. Le café est servi
-6. La machine revient à l’état d’attente
+2. L'utilisateur valide sa sélection en passant une carte NFC
+3. _La machine chauffe l’eau_
+4. Le servomoteur laisse passer une dose de café soluble
+5. La pompe s’active
+6. Le café est servi
+7. La machine revient à l’état d’attente
 
 # 🧰 Matériel
 
@@ -32,7 +34,8 @@ Exemple de déroulement :
 |-----------|-------------|
 | **STM32 Nucleo-G431** | Carte de développement principale |
 | **TFT ILI9341** | Écran tactile pour l’interface utilisateur |
-| **Pompe à eau** | Simulation du flux d’eau |
+| **NFC03A1** | Module de communication NFC |
+| **Electrovanne** | Simulation du flux d’eau |
 | **Servomoteur à butée** | Distribution du café soluble |
 
 ### Périphériques optionnels
@@ -63,6 +66,8 @@ tykawa/
 ├── app/
 │ ├── config.h
 │ ├── main.c # Point d'entrée
+│ ├── nfc.c # Gestion du lecteur NFC
+│ ├── nfc.h
 │ ├── screen.c # Gestion de l'écran TFT
 │ ├── screen.h
 │ ├── servo.c # Gestion du servomoteur
@@ -73,7 +78,7 @@ tykawa/
 │ ├── cmsis
 │ └── stm32g4xx_hal/
 │
-├── html/
+├── docs/html/
 │ └── index.html # Documentation Doxygen
 |
 └── README.md
@@ -88,12 +93,12 @@ Le firmware est organisé autour d’une **machine à états** représentant les
 ```mermaid
 stateDiagram-v2
 
-INIT --> IDLE
-IDLE --> PAYMENT : Sélection d'un café
-PAYMENT --> IDLE : Retour ou temps écoulé
+INIT --> IDLE_CHOICE
+IDLE_CHOICE --> PAYMENT : Sélection d'un café
+PAYMENT --> IDLE_CHOICE : Retour ou temps écoulé
 PAYMENT --> WORKING : Paiement validé
 WORKING --> DONE : Café prêt
-DONE --> IDLE : Retour à l'attente
+DONE --> IDLE_CHOICE : Retour à l'attente
 ```
 
 ### États principaux
@@ -101,26 +106,17 @@ DONE --> IDLE : Retour à l'attente
 | État        | Description                            |
 | ----------- | -------------------------------------- |
 | **INIT**    | Initialisation des différents éléments |
-| **IDLE**    | En attente de la sélection d'un café   |
+| **IDLE_CHOICE**    | En attente de la sélection d'un café   |
 | **PAYMENT** | En attente du paiement (retour auto apres ~1s) |
 | **WORKING** | Préparation du café                    |
 | **DONE**    | Café prêt, écran de fin (~1s)          |
 
 Chaque état contrôle les périphériques nécessaires et déclenche des transitions en fonction du temps ou des entrées utilisateur.
 
-## 🔌 Périphériques utilisés
-
-| Périphérique | Rôle |
-|---------------|------|
-| TFT ILI9341 | Interface utilisateur |
-| Servomoteur, Electrovanne | Préparation du café | 
-| Timer | Simulation du temps de préparation |
-| UART (optionnel) | Messages de debug |
-
 ## 🚀 Compilation et exécution
 
 1. **Cloner le dépôt**
-   - ```git clone https://github.com/yourusername/coffee-machine-stm32.git```
+   - ```git clone https://github.com/cassoule/tykawa.git```
 2. **Ouvrir le projet**
    - Importer le projet dans STM32CubeIDE.
 3. **Compiler**
@@ -143,5 +139,5 @@ Ce projet illustre plusieurs concepts importants des systèmes embarqués :
 ## 📚 Documentation
 La documentation générée avec Doxygen est disponible dans :
 ```
-/html/index.html
+/docs/html/index.html
 ```
