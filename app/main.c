@@ -53,62 +53,11 @@ int main(void)
 	while (1)
 	{
 		state_machine();
+		//test_NFC_State_Machine();
 	}
 }
 
-/**
- * @brief Machine à état pour tester le fonctionnement du lecteur NFC
- */
-void test_NFC_State_Machine(void){
-	printf("enterring NFC state machine\n");
 
-	typedef enum {
-		INIT = 0,
-		WAITING_NFC,
-		STATE_SEND_NFC,
-		END_RECEPTION,
-		ERROR_NFC
-	} state_e;
-
-
-
-	static state_e state = INIT;
-	uint16_t taille;
-	char contenu[256];
-
-	switch (state){
-		case INIT :
-			printf("init NFC\n");
-			state = WAITING_NFC;
-			break;
-
-		case WAITING_NFC :
-			if(receive_NFC_Data(&infos)){
-				printf("Frame received\n");
-				state=STATE_SEND_NFC;
-			}
-			break;
-
-		case STATE_SEND_NFC:{
-			for(int i=0; i<infos.UIDsize; i++){
-				contenu[i] = infos.UID[i];
-			}
-			taille = infos.UIDsize;
-			state = END_RECEPTION;
-			break;
-
-		case END_RECEPTION :
-
-			state = WAITING_NFC;
-			break;
-
-		case ERROR_NFC :
-			printf("Error : No data Received while waiting data from NFC");
-			state = ERROR_NFC;
-			break;
-
-	}
-}}
 
 
 /**
@@ -127,6 +76,9 @@ void state_machine(void) {
 	const uint32_t COFFEE_DURATION_US = 2000000;
 
 	static state_e state = INIT;
+	static state_e previous_state = INIT;
+	bool entry = (state!=previous_state);
+	previous_state=state;
 	static uint8_t u_choice = 0;
 	static uint32_t delay = 0;
 	uint16_t taille;
@@ -144,7 +96,10 @@ void state_machine(void) {
 
 		case IDLE_CHOICE: {
 			int choice = u_choice_handler();
-			printf("enter in idle choice\n");
+			if(entry){
+				printf("enter in idle choice\n");
+			}
+
 			if (choice) { //instead of : choice != 0
 				u_choice = choice;
 				delay = 0;
@@ -156,9 +111,14 @@ void state_machine(void) {
 		}
 
 		case PAYMENT: {
+			// First entry in state
+			if(entry){
+				printf("enter in payment\n");
+				BSP_NFC03A1_Init(PCD);
+			}
 			delay++;
-			BSP_NFC03A1_Init(PCD);
-			printf("enter in payment\n");
+
+
 			if(receive_NFC_Data(&infos)){
 				printf("NFC frame received");
 				SCREEN_draw_working_screen(u_choice);
@@ -176,7 +136,7 @@ void state_machine(void) {
 				SCREEN_draw_idle_screen();
 				state = IDLE_CHOICE;
 			}
-			// TODO: Handle NFC
+
 			break;
 		}
 
@@ -211,6 +171,7 @@ void state_machine(void) {
 		default:
 			break;
 	}
+
 }
 
 /**
@@ -231,14 +192,19 @@ void open_coffee_servo(void) {
 int u_choice_handler(){
 
 	if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) {
-	    printf("btn left received\n");
-	    return 1;
+		HAL_Delay(50);
+		if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_4) == GPIO_PIN_RESET) {
+			printf("btn left received\n");
+			return 1;
+		}
+	}
 
-	    }
-	else if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_5) == GPIO_PIN_RESET) {
-	    printf("btn right received\n");
-	    return 2;
-
+	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) {
+		HAL_Delay(50);
+		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_15) == GPIO_PIN_RESET) {
+			printf("btn right received\n");
+			return 2;
+	}
 	}
 	printf("no btn received\n");
 	return 0;
