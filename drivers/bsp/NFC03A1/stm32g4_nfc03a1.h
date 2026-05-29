@@ -42,7 +42,7 @@
 
 //#define RFTRANS_95HF_IRQ_HANDLER        EXTI15_10_IRQHandler
 #define IRQOUT_RFTRANS_95HF_PORT		GPIOA
-#define IRQOUT_RFTRANS_95HF_PIN			GPIO_PIN_10
+#define IRQOUT_RFTRANS_95HF_PIN			GPIO_PIN_1
 #define IRQIN_RFTRANS_GPIO_PORT			GPIOA
 #define IRQIN_RFTRANS_95HF_PIN			GPIO_PIN_9
 
@@ -207,7 +207,6 @@ void BSP_NFC03A1_demo(void);
 typedef enum {UNDEFINED_MODE=0,PICC,PCD}DeviceMode_t;
 
 void BSP_NFC03A1_Init(DeviceMode_t dm);
-
 
 #endif
 #endif /* BSP_NFC03A1_STM32G4_NFC03A1_H_ */

@@ -15,7 +15,7 @@ static uint16_t current_position;
 uint16_t position;
 
 /**
- * @brief  Initialise le servo moteur
+ * @brief  Initialise le servomoteur
  *
  */
 void SERVO_init(void) {

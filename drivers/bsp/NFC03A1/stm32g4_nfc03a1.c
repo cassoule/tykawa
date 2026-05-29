@@ -94,6 +94,7 @@ void BSP_NFC03A1_demo(void)
 		switch(tag)
 		{
 			case TRACK_NFCTYPE4A:{
+				printf("Tag detected\n");
 				ISO14443A_CARD infos;
 				BSP_NFC03A1_get_ISO14443A_infos(&infos);
 				uint8_t i;
@@ -194,6 +195,7 @@ void drvInt_Disable_95HF_IRQ(void)
   uDataReady = false;
   BSP_EXTIT_disable(BSP_EXTIT_gpiopin_to_pin_number(IRQOUT_RFTRANS_95HF_PIN));
 }
+
 
 #endif
 

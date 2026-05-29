@@ -20,7 +20,7 @@ void SCREEN_init(void) {
 
 	/* Tactile */
 	ILI9341_setConfig();
-	XPT2046_init();
+
 }
 
 /**
@@ -47,7 +47,7 @@ void SCREEN_draw_idle_screen(void) {
  * @brief Dessine l'écran de paiement
  * @param choice: choix initial de l'utilisateur à afficher (1 ou 2)
  */
-void SCREEN_draw_payment_screen(void) {
+void SCREEN_draw_payment_screen(uint8_t choice) {
 	SCREEN_clear();
 	ILI9341_printf(15, 20, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "Retour");
 	ILI9341_printf(15, 110, &Font_11x18, ILI9341_COLOR_BLACK, ILI9341_COLOR_WHITE, "Votre choix: %s", (choice == 1 ? "Espresso" : "Coffee"));
@@ -86,24 +86,24 @@ void SCREEN_draw_done_screen(uint8_t choice) {
  * @brief Cette fonction gère le clic d'un utilisateur sur l'écran IDLE
  * @return Le choix de l'utilisateur (1 ou 2), 0 si l'utilisateur n'a fait aucun choix
  */
-uint8_t SCREEN_handle_click(void) {
-	int16_t x, y;
-	if(XPT2046_getMedianCoordinates(&x, &y, XPT2046_COORDINATE_SCREEN_RELATIVE))
-	{
-		return y < 120 ? 1 : 2;
-	}
-	return 0;
-}
+//uint8_t SCREEN_handle_click(void) {
+//	int16_t x, y;
+//	if(XPT2046_getMedianCoordinates(&x, &y, XPT2046_COORDINATE_SCREEN_RELATIVE))
+//	{
+//		return y < 120 ? 1 : 2;
+//	}
+//	return 0;
+//}
 
 /**
  * @brief Cette fonction gère le clic d'un utilisateur sur l'écran PAYMENT
  * @return 1 si l'utilisateur clique sur 'Retour' 0 sinon
  */
-uint8_t SCREEN_handle_back_click(void) {
-	int16_t x, y;
-	if(XPT2046_getMedianCoordinates(&x, &y, XPT2046_COORDINATE_SCREEN_RELATIVE))
-	{
-		return (y < 60 & x < 50) ? 1 : 0;
-	}
-	return 0;
-}
+//uint8_t SCREEN_handle_back_click(void) {
+//	int16_t x, y;
+//	if(XPT2046_getMedianCoordinates(&x, &y, XPT2046_COORDINATE_SCREEN_RELATIVE))
+//	{
+//		return (y < 60 & x < 50) ? 1 : 0;
+//	}
+//	return 0;
+//}
